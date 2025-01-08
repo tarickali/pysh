@@ -14,6 +14,11 @@ def handle_exit(args: list[str]) -> None:
     exit(status)
 
 
+def handle_echo(args: list[str]) -> None:
+    print(" ".join(args))
+
+
 builtins = {
     "exit": handle_exit,
+    "echo": handle_echo,
 }
