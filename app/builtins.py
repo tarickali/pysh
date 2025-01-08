@@ -1,3 +1,5 @@
+from .utils import locate_executable
+
 __all__ = ["builtins"]
 
 
@@ -18,7 +20,18 @@ def handle_echo(args: list[str]) -> None:
     print(" ".join(args))
 
 
+def handle_type(args: list[str]) -> None:
+    for command in args:
+        if command in builtins:
+            print(f"{command} is a shell builtin")
+        elif executable := locate_executable(command):
+            print(f"{command} is {executable}")
+        else:
+            print(f"{command}: not found")
+
+
 builtins = {
     "exit": handle_exit,
     "echo": handle_echo,
+    "type": handle_type,
 }
