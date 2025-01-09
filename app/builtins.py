@@ -1,3 +1,5 @@
+import os
+
 from .utils import locate_executable
 
 __all__ = ["builtins"]
@@ -5,11 +7,11 @@ __all__ = ["builtins"]
 
 def handle_exit(args: list[str]) -> None:
     if len(args) > 1:
-        print(f"exit: too many arguments")
+        print("exit: too many arguments")
         return
 
     if len(args) == 1 and not args[0].isnumeric():
-        print(f"exit: invalid usage")
+        print("exit: invalid usage")
         return
 
     status = int(args[0]) if len(args) != 0 else 0
@@ -30,8 +32,17 @@ def handle_type(args: list[str]) -> None:
             print(f"{command}: not found")
 
 
+def handle_pwd(args: list[str]) -> None:
+    if len(args) != 0:
+        print("pwd: too many arguments")
+        return
+
+    print(os.getcwd())
+
+
 builtins = {
     "exit": handle_exit,
     "echo": handle_echo,
     "type": handle_type,
+    "pwd": handle_pwd,
 }
