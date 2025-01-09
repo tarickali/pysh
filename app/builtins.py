@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from .utils import locate_executable
 
@@ -40,9 +41,31 @@ def handle_pwd(args: list[str]) -> None:
     print(os.getcwd())
 
 
+def handle_cd(args: list[str]) -> None:
+    if len(args) == 0:
+        return
+    if len(args) > 1:
+        print("cd: too many arguments")
+        return
+
+    path = args[0]  # assume absolute path
+    if path[0] == "~":  # home directory
+        HOME = os.environ.get("HOME", "/")
+        path = HOME if len(path) == 1 else HOME + path[1:]
+        path = os.path.abspath(path)
+    elif not os.path.isabs(path):  # relative path
+        path = os.path.abspath(path)
+
+    if os.path.exists(path):
+        os.chdir(path)
+    else:
+        print(f"cd: no such file or directory: {path}")
+
+
 builtins = {
     "exit": handle_exit,
     "echo": handle_echo,
     "type": handle_type,
     "pwd": handle_pwd,
+    "cd": handle_cd,
 }
