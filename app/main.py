@@ -9,6 +9,8 @@ def main():
         command, *args = input("$ ").split(" ")
         if command in builtins:
             builtins[command](args)
+        elif locate_executable(command) is not None:
+            subprocess.run([command, *args])
         else:
             print(f"{command}: command not found.")
 
