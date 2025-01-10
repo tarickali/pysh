@@ -59,7 +59,17 @@ def handle_cd(args: list[str]) -> None:
     if os.path.exists(path):
         os.chdir(path)
     else:
-        print(f"cd: no such file or directory: {path}")
+        print(f"cd: No such file or directory: {path}")
+
+
+def handle_cat(args: list[str]) -> None:
+    content = ""
+    for arg in args:
+        try:
+            content += open(arg).read()
+        except:
+            content = f"cat: {arg}: No such file or directory\n"
+    print(content, end="")
 
 
 builtins = {
@@ -68,4 +78,5 @@ builtins = {
     "type": handle_type,
     "pwd": handle_pwd,
     "cd": handle_cd,
+    "cat": handle_cat,
 }
