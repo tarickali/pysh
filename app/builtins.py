@@ -1,13 +1,12 @@
 import os
-from pathlib import Path
 
-from .utils import locate_executable
+from .utils import locate_executable, fprint
 
 __all__ = ["builtins"]
 
 
-def handle_exit(args: list[str]) -> None:
-    if len(args) > 1:
+def handle_exit(args: list[str], files: list[str]) -> None:
+    if len(args) > 1 or len(files) != 1:
         print("exit: too many arguments")
         return
 
@@ -19,34 +18,39 @@ def handle_exit(args: list[str]) -> None:
     exit(status)
 
 
-def handle_echo(args: list[str]) -> None:
-    print(" ".join(args))
+def handle_echo(args: list[str], files: list[str]) -> None:
+    content = " ".join(args)
+    fprint(content, files)
 
 
-def handle_type(args: list[str]) -> None:
+def handle_type(args: list[str], files: list[str]) -> None:
+    content = ""
     for command in args:
         if command in builtins:
-            print(f"{command} is a shell builtin")
+            content += f"{command} is a shell builtin"
         elif executable := locate_executable(command):
-            print(f"{command} is {executable}")
+            content += f"{command} is {executable}"
         else:
-            print(f"{command}: not found")
+            content += f"{command}: not found"
+
+    fprint(content, files)
 
 
-def handle_pwd(args: list[str]) -> None:
+def handle_pwd(args: list[str], files: list[str]) -> None:
+    content = ""
     if len(args) != 0:
-        print("pwd: too many arguments")
-        return
+        content += "pwd: too many arguments"
 
-    print(os.getcwd())
+    fprint(os.getcwd(), files)
 
 
-def handle_cd(args: list[str]) -> None:
-    if len(args) == 0:
-        return
+def handle_cd(args: list[str], files: list[str]) -> None:
     if len(args) > 1:
         print("cd: too many arguments")
         return
+
+    if len(args) == 0:
+        args = ["~"]
 
     path = args[0]  # assume absolute path
     if path[0] == "~":  # home directory
@@ -62,14 +66,19 @@ def handle_cd(args: list[str]) -> None:
         print(f"cd: No such file or directory: {path}")
 
 
-def handle_cat(args: list[str]) -> None:
+def handle_cat(args: list[str], files: list[str]) -> None:
     content = ""
     for arg in args:
         try:
             content += open(arg).read()
         except:
-            content = f"cat: {arg}: No such file or directory\n"
-    print(content, end="")
+            print(f"cat: {arg}: No such file or directory")
+
+    fprint(content, files, end="")
+
+
+def handle_ls(args: list[str], files: list[str]) -> None:
+    pass
 
 
 builtins = {
