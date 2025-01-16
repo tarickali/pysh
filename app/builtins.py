@@ -5,25 +5,25 @@ from .utils import locate_executable, fprint
 __all__ = ["builtins"]
 
 
-def handle_exit(args: list[str], files: list[str]) -> None:
-    if len(args) > 1 or len(files) != 1:
-        print("exit: too many arguments")
+def handle_exit(args: list[str], ostreams: list[str], estreams: list[str]) -> None:
+    if len(args) > 1:
+        fprint(error="exit: too many arguments", estreams=estreams)
         return
 
     if len(args) == 1 and not args[0].isnumeric():
-        print("exit: invalid usage")
+        fprint(error="exit: invalid usage", estreams=estreams)
         return
 
     status = int(args[0]) if len(args) != 0 else 0
     exit(status)
 
 
-def handle_echo(args: list[str], files: list[str]) -> None:
+def handle_echo(args: list[str], ostreams: list[str], estreams: list[str]) -> None:
     content = " ".join(args)
-    fprint(content, files)
+    fprint(content=content, ostreams=ostreams, estreams=estreams)
 
 
-def handle_type(args: list[str], files: list[str]) -> None:
+def handle_type(args: list[str], ostreams: list[str], estreams: list[str]) -> None:
     content = ""
     for command in args:
         if command in builtins:
@@ -33,20 +33,20 @@ def handle_type(args: list[str], files: list[str]) -> None:
         else:
             content += f"{command}: not found"
 
-    fprint(content, files)
+    fprint(content=content, ostreams=ostreams)
 
 
-def handle_pwd(args: list[str], files: list[str]) -> None:
-    content = ""
+def handle_pwd(args: list[str], ostreams: list[str], estreams: list[str]) -> None:
+    errors = ""
     if len(args) != 0:
-        content += "pwd: too many arguments"
+        errors += "pwd: too many arguments"
 
-    fprint(os.getcwd(), files)
+    fprint(content=os.getcwd(), ostreams=ostreams, error=errors, estreams=estreams)
 
 
-def handle_cd(args: list[str], files: list[str]) -> None:
+def handle_cd(args: list[str], ostreams: list[str], estreams: list[str]) -> None:
     if len(args) > 1:
-        print("cd: too many arguments")
+        fprint(error="cd: too many arguments", estreams=estreams)
         return
 
     if len(args) == 0:
@@ -63,7 +63,7 @@ def handle_cd(args: list[str], files: list[str]) -> None:
     if os.path.exists(path):
         os.chdir(path)
     else:
-        print(f"cd: No such file or directory: {path}")
+        fprint(error=f"cd: {path}: No such file or directory", estreams=estreams)
 
 
 def handle_cat(args: list[str], files: list[str]) -> None:
@@ -87,5 +87,5 @@ builtins = {
     "type": handle_type,
     "pwd": handle_pwd,
     "cd": handle_cd,
-    "cat": handle_cat,
+    # "cat": handle_cat,
 }
